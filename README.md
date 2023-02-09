@@ -129,14 +129,29 @@ fetcher.use(logger)
 
 ### Server Side Usage
 
-This library can be used server side if you have a compatible fetch lib (e.g. [cross-fetch](https://www.npmjs.com/package/cross-fetch)):
+This library can be used server side if you have a compatible fetch lib (e.g. `node-fetch`).
+
 ```sh
 npm install cross-fetch
 ```
-You will then need to inject `fetch` into your instance:
+
+You will then need to inject `fetch` into the config:
+
 ```ts
-import fetch from 'cross-fetch'
-const fetcher = Fetcher.for<paths>(fetch)
+import altFetch, { Headers } from 'node-fetch'
+const fetcher = Fetcher.for<paths>()
+fetcher.configure({
+  fetchProvider: {
+    fetch: altFetch as any,
+    headers: Headers as any,
+  },
+  baseUrl: 'https://api.backend.dev',
+  init: {
+    headers: {
+      Authorization: 'Bearer token',
+    },
+  },
+})
 ```
 
 If you want/need to use [node-fetch](https://www.npmjs.com/package/node-fetch) there is an issue because it's not type-compatible with native fetch. See discussion and workarounds for it here: https://github.com/apollographql/apollo-link/issues/513#issuecomment-548219023

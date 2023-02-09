@@ -1,18 +1,25 @@
-import 'whatwg-fetch'
-
 import { server } from './mocks/server'
 import { ApiError, arrayRequestBody, Fetcher } from '../src'
 import { Data, paths } from './paths'
+import altFetch, { Headers } from 'node-fetch'
 
 beforeAll(() => server.listen())
 afterEach(() => server.resetHandlers())
 afterAll(() => server.close())
 
-describe('fetch', () => {
-  const fetcher = Fetcher.for<paths>()
+/**
+ * @jest-environment node
+ */
+describe('alternative fetch', () => {
+  let fetcher: any
 
   beforeEach(() => {
+    fetcher = Fetcher.for<paths>()
     fetcher.configure({
+      fetchProvider: {
+        fetch: altFetch as any,
+        headers: Headers as any,
+      },
       baseUrl: 'https://api.backend.dev',
       init: {
         headers: {
@@ -24,11 +31,19 @@ describe('fetch', () => {
 
   const expectedHeaders = {
     authorization: 'Bearer token',
+    connection: 'close',
     accept: 'application/json',
+    "host": "api.backend.dev",
+    'accept-encoding': 'gzip,deflate',
+    'user-agent': 'node-fetch/1.0 (+https://github.com/bitinn/node-fetch)',
+  }
+  const expectedHeadersWithContentLength = {
+    ...expectedHeaders,
+    'content-length': expect.stringMatching(/\d+/),
   }
 
   const headersWithContentType = {
-    ...expectedHeaders,
+    ...expectedHeadersWithContentLength,
     'content-type': 'application/json',
   }
 
@@ -52,7 +67,7 @@ describe('fetch', () => {
 
   const methods = ['post', 'put', 'patch', 'delete'] as const
 
-  methods.forEach((method) => {
+  for (const method of methods) {
     it(`${method.toUpperCase()} /body/{id}`, async () => {
       const fun = fetcher.path('/body/{id}').method(method).create()
 
@@ -66,7 +81,7 @@ describe('fetch', () => {
       expect(data.query).toEqual({})
       expect(data.headers).toEqual(headersWithContentType)
     })
-  })
+  }
 
   methods.forEach((method) => {
     it(`${method.toUpperCase()} /bodyarray/{id}`, async () => {
@@ -185,6 +200,8 @@ describe('fetch', () => {
       await fun({})
     } catch (e) {
       if (e instanceof fun.Error) {
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
         const error = e.getActualType()
         expect(error.status).toBe(500)
         expect(error.data).toEqual('internal server error')
@@ -239,6 +256,8 @@ describe('fetch', () => {
 
     const captured = { url: '', body: '' }
 
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
     fetcher.use(async (url, init, next) => {
       init.headers.set('mw1', 'true')
 
@@ -252,6 +271,8 @@ describe('fetch', () => {
       return response
     })
 
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
     fetcher.use(async (url, init, next) => {
       const response = await next(url, init)
       const data = response.data as Data

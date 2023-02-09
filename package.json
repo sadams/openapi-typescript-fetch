@@ -20,7 +20,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/ajaishankar/openapi-typescript-fetch"
+    "url": "https://github.com/sadams/openapi-typescript-fetch"
   },
   "keywords": [
     "fetch",
@@ -33,24 +33,27 @@
     "node"
   ],
   "bugs": {
-    "url": "https://github.com/ajaishankar/openapi-typescript-fetch/issues"
+    "url": "https://github.com/sadams/openapi-typescript-fetch/issues"
   },
-  "homepage": "https://github.com/ajaishankar/openapi-typescript-fetch#readme",
+  "homepage": "https://github.com/sadams/openapi-typescript-fetch#readme",
   "devDependencies": {
-    "msw": "^0.35.0",
-    "@typescript-eslint/eslint-plugin": "^4.30.0",
-    "@typescript-eslint/parser": "^4.31.0",
-    "eslint": "^7.32.0",
-    "eslint-config-prettier": "^8.3.0",
-    "eslint-plugin-prettier": "^4.0.0",
+    "@types/jest": "^29.4.0",
+    "@types/node-fetch": "^2.6.2",
+    "@typescript-eslint/eslint-plugin": "^5.51.0",
+    "@typescript-eslint/parser": "^5.51.0",
     "codecov": "^3.8.2",
-    "jest": "^27.2.5",
-    "@types/jest": "^27.0.0",
-    "prettier": "^2.4.0",
-    "rimraf": "^3.0.0",
-    "ts-node": "^10.0.0",
-    "ts-jest": "^27.0.0",
-    "typescript": "^4.4.3",
+    "eslint": "^8.33.0",
+    "eslint-config-prettier": "^8.6.0",
+    "eslint-plugin-prettier": "^4.2.1",
+    "jest": "^29.4.2",
+    "jest-environment-jsdom": "^29.4.2",
+    "msw": "^1.0.0",
+    "node-fetch": "^2.6.9",
+    "prettier": "^2.8.4",
+    "rimraf": "^4.1.2",
+    "ts-jest": "^29.0.5",
+    "ts-node": "^10.9.1",
+    "typescript": "^4.9.5",
     "whatwg-fetch": "^3.6.2"
   },
   "prettier": {

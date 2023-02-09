@@ -1,5 +1,5 @@
 [![version(scoped)](https://img.shields.io/npm/v/openapi-typescript-fetch.svg)](https://www.npmjs.com/package/openapi-typescript-fetch)
-[![codecov](https://codecov.io/gh/ajaishankar/openapi-typescript-fetch/branch/main/graph/badge.svg?token=Z8GQ6M5KAR)](https://codecov.io/gh/ajaishankar/openapi-typescript-fetch)
+[![codecov](https://codecov.io/gh/sadams/openapi-typescript-fetch/branch/main/graph/badge.svg?token=Z8GQ6M5KAR)](https://codecov.io/gh/sadams/openapi-typescript-fetch)
 
 # 📘️ openapi-typescript-fetch
 
@@ -68,6 +68,8 @@ const { status, data: pets } = await findPetsByStatus({
 console.log(pets[0])
 ```
 
+
+
 ### Typed Error Handling
 
 A non-ok fetch response throws a generic `ApiError`
@@ -127,27 +129,32 @@ fetcher.use(logger)
 
 ### Server Side Usage
 
-This library can be used server side with [node-fetch](https://www.npmjs.com/package/node-fetch)
+This library can be used server side if you have a compatible fetch lib (e.g. `node-fetch`).
 
-Node CommonJS setup
-```ts
-// install node-fetch v2
-npm install node-fetch@2
-npm install @types/node-fetch@2
-
-// fetch-polyfill.ts
-import fetch, { Headers, Request, Response } from 'node-fetch'
-
-if (!globalThis.fetch) {
-    globalThis.fetch = fetch as any
-    globalThis.Headers = Headers as any
-    globalThis.Request = Request as any
-    globalThis.Response = Response as any
-}
-
-// index.ts
-import './fetch-polyfill'
+```sh
+npm install cross-fetch
 ```
+
+You will then need to inject `fetch` into the config:
+
+```ts
+import altFetch, { Headers } from 'node-fetch'
+const fetcher = Fetcher.for<paths>()
+fetcher.configure({
+  fetchProvider: {
+    fetch: altFetch as any,
+    headers: Headers as any,
+  },
+  baseUrl: 'https://api.backend.dev',
+  init: {
+    headers: {
+      Authorization: 'Bearer token',
+    },
+  },
+})
+```
+
+If you want/need to use [node-fetch](https://www.npmjs.com/package/node-fetch) there is an issue because it's not type-compatible with native fetch. See discussion and workarounds for it here: https://github.com/apollographql/apollo-link/issues/513#issuecomment-548219023
 
 ### Utility Types
 
@@ -181,7 +188,7 @@ type Err = FetchErrorType<typeof findPetsByStatus>
 
 ### Utility Methods
 
-- `arrayRequestBody` - Helper to merge params when request body is an array [see issue](https://github.com/ajaishankar/openapi-typescript-fetch/issues/3#issuecomment-952963986)
+- `arrayRequestBody` - Helper to merge params when request body is an array [see issue](https://github.com/sadams/openapi-typescript-fetch/issues/3#issuecomment-952963986)
 
 ```ts
 

@@ -150,7 +150,11 @@ async function getResponseData(response: Response) {
   }
 }
 
-async function fetchJson(url: string, init: RequestInit): Promise<ApiResponse> {
+async function fetchJson(
+  url: string,
+  init: RequestInit,
+  fetch = globalThis.fetch,
+): Promise<ApiResponse> {
   const response = await fetch(url, init)
 
   const data = await getResponseData(response)
@@ -227,11 +231,16 @@ function createFetch<OP>(fetch: _TypedFetch<OP>): TypedFetch<OP> {
   return fun
 }
 
-function fetcher<Paths>() {
+function fetcher<Paths>(_fetch = globalThis.fetch) {
   let baseUrl = ''
   let defaultInit: RequestInit = {}
   const middlewares: Middleware[] = []
-  const fetch = wrapMiddlewares(middlewares, fetchJson)
+  const fetch = wrapMiddlewares(
+    middlewares,
+    (url: string, init: RequestInit) => {
+      return fetchJson(url, init, _fetch)
+    },
+  )
 
   return {
     configure: (config: FetchConfig) => {
@@ -261,5 +270,6 @@ function fetcher<Paths>() {
 }
 
 export const Fetcher = {
-  for: <Paths extends OpenapiPaths<Paths>>() => fetcher<Paths>(),
+  for: <Paths extends OpenapiPaths<Paths>>(fetch = globalThis.fetch) =>
+    fetcher<Paths>(fetch),
 }
